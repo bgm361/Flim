@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflixo | Welcome to VIP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --red: #ff0000;
+            --deep-black: #0a0a0a;
+            --gold: #d4af37;
+            --accent: #1a1a1a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--deep-black);
+            /* Arka planı görsel yerine derinlikli bir mesh gradient yaptık */
+            background-image:
+                radial-gradient(at 0% 0%, rgba(229, 9, 20, 0.15) 0, transparent 40%),
+                radial-gradient(at 100% 100%, rgba(212, 175, 55, 0.1) 0, transparent 40%);
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Dekoratif Işık Sızmaları (Görsel yerine modern ışık oyunları) */
+        .light-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: var(--red);
+            filter: blur(180px);
+            border-radius: 50%;
+            z-index: 0;
+            opacity: 0.1;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        nav {
+            padding: 50px 8%;
+            display: flex;
+            justify-content: center; /* Logoyu merkeze aldık */
+            z-index: 100;
+        }
+
+        .logo {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span { color: var(--red); }
+
+        .hero {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 10;
+            padding: 0 20px;
+        }
+
+        .badge {
+            background: var(--accent);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: 5rem;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 25px;
+            background: linear-gradient(to bottom, #fff 40%, #777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            max-width: 1000px;
+        }
+
+        p {
+            font-size: 1.25rem;
+            color: #888;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 50px;
+        }
+
+        .cta-box {
+            display: flex;
+            gap: 20px;
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn {
+            padding: 18px 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-main {
+            background: white;
+            color: black;
+        }
+
+        .btn-main:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255,255,255,0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--red);
+        }
+
+        /* Alt Alan Süslemesi */
+        .preview-footer {
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            opacity: 0.4;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            .cta-box { flex-direction: column; width: 100%; }
+            .btn { width: 100%; justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="light-glow"></div>
+
+<nav>
+    <a href="/" class="logo">NETFLIX<span>O</span></a>
+</nav>
+
+<div class="hero">
+    <div class="badge">Eğlencenin Yeni Standardı</div>
+    <h1>Sinema Deneyimini<br>Yeniden Tanımla.</h1>
+    <p>Kalabalıktan uzak, sadece size özel bir film kataloğu. En yüksek çözünürlük ve VIP konforu burada.</p>
+
+    <div class="cta-box">
+        <a th:href="@{/kayit}" class="btn btn-main">Ücretsiz Dene</a>
+        <a th:href="@{/login}" class="btn btn-secondary">Üye Girişi <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
+</div>
+
+<div class="preview-footer">
+    <span>4K ULTRA HD</span>
+    <span>DOLBY ATMOS</span>
+    <span>AD-FREE</span>
+    <span>VIP ACCESS</span>
+</div>
+
+</body>
+</html>

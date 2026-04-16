@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Netflixo | VIP Recovery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --red: #E50914;
+            --black: #050505;
+            --gold: #D4AF37;
+            --glass: rgba(255, 255, 255, 0.03);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at bottom left, #1a1a1a 0%, var(--black) 100%);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .recovery-card {
+            background: rgba(18, 18, 18, 0.85);
+            backdrop-filter: blur(25px);
+            padding: 40px;
+            border-radius: 20px;
+            width: 420px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+        }
+
+        h2 {
+            color: white;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 span { color: var(--red); }
+
+        .row { margin-bottom: 20px; position: relative; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #222;
+            color: white;
+            border-radius: 10px;
+            box-sizing: border-box;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--red);
+            background: #000;
+            box-shadow: 0 0 15px rgba(229, 9, 20, 0.1);
+        }
+
+        /* Captcha Tasarımı */
+        .captcha-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .captcha-display {
+            background: linear-gradient(45deg, #e6e6e6, #ffffff);
+            color: #111;
+            font-weight: 900;
+            font-style: italic;
+            padding: 10px 20px;
+            text-align: center;
+            letter-spacing: 8px;
+            font-size: 22px;
+            border-radius: 8px;
+            flex: 1;
+            user-select: none;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            text-decoration: line-through; /* Güvenlik hissi için */
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 2;
+            padding: 14px;
+            background: var(--red);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: #ff1e2a;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(229, 9, 20, 0.3);
+        }
+
+        .btn-back {
+            flex: 1;
+            padding: 14px;
+            background: #222;
+            color: #aaa;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover {
+            background: #333;
+            color: white;
+        }
+
+        /* İkonlar */
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 38px;
+            color: #444;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="recovery-card">
+    <h2><span>Şifre</span> Sıfırla</h2>
+
+    <form th:action="@{/sifresifirla}" method="post">
+        <div class="row">
+            <label><i class="fa-solid fa-envelope"></i> E-Posta Adresiniz</label>
+            <input type="email" name="email" placeholder="mail@ornek.com" required>
+        </div>
+
+        <div class="row">
+            <label><i class="fa-solid fa-key"></i> Yeni Şifre</label>
+            <input type="password" name="yeniSifre" placeholder="••••••••" maxlength="10" required>
+        </div>
+
+        <div class="row">
+            <label><i class="fa-solid fa-shield-check"></i> Şifre Tekrar</label>
+            <input type="password" name="yeniSifreTekrar" placeholder="••••••••" maxlength="10" required>
+        </div>
+
+        <div class="row">
+            <label>Güvenlik Doğrulaması</label>
+            <div class="captcha-wrapper">
+                <input type="text" name="captchaInput" placeholder="Kodu girin" required style="flex: 1;">
+                <div class="captcha-display">ce38a</div>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button type="submit">Güncelle</button>
+            <a th:href="@{/login}" class="btn-back">Geri</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

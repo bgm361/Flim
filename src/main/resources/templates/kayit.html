@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Netflixo | VIP Registration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --red: #E50914; --black: #050505; --gold: #D4AF37; }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100vh; overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle at top right, #1a1a1a 0%, var(--black) 100%);
+            display: flex; justify-content: center; align-items: center; color: white;
+        }
+        .register-card {
+            background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(25px);
+            padding: 35px 40px; border-radius: 25px; width: 420px;
+            border: 1px solid rgba(255, 255, 255, 0.05); box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            position: relative;
+        }
+        .register-card::before {
+            content: ""; position: absolute; top: 0; left: 15%; right: 15%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        h2 { font-size: 2.2rem; font-weight: 800; text-align: center; margin-bottom: 25px; letter-spacing: -1px; }
+        h2 span { color: var(--red); }
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 5px; }
+        .input-group { margin-bottom: 18px; position: relative; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 0.75rem; font-weight: 600; color: var(--gold); text-transform: uppercase; }
+        input {
+            width: 100%; padding: 14px 15px; background: rgba(0, 0, 0, 0.4); border: 1px solid #222;
+            color: white; border-radius: 12px; font-size: 0.9rem; box-sizing: border-box; transition: 0.3s;
+        }
+        input:focus { outline: none; border-color: var(--red); background: #000; box-shadow: 0 0 15px rgba(229, 9, 20, 0.2); }
+        .field-icon { position: absolute; right: 15px; top: 40px; color: #444; font-size: 0.9rem; }
+        .btn-register {
+            width: 100%; padding: 16px; background: var(--red); border: none; color: white;
+            font-weight: 800; border-radius: 12px; cursor: pointer; text-transform: uppercase;
+            font-size: 1rem; letter-spacing: 1px; box-shadow: 0 10px 20px rgba(229, 9, 20, 0.3); transition: 0.4s;
+            margin-top: 10px;
+        }
+        .btn-register:hover { transform: translateY(-3px); background: #ff1e2a; box-shadow: 0 15px 25px rgba(229, 9, 20, 0.5); }
+        .footer-text { text-align: center; margin-top: 20px; font-size: 0.85rem; color: #777; }
+        .footer-text a { color: var(--gold); text-decoration: none; font-weight: 600; }
+
+        /* Şifre uyuşmazlığı hatası için stil */
+        .error-msg { color: var(--red); font-size: 0.7rem; margin-top: 5px; display: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+<div class="register-card">
+    <h2><span>Kayıt</span> Ol</h2>
+
+    <form th:action="@{/kayit}" method="post" onsubmit="return validatePasswords()">
+        <div class="input-row">
+            <div class="input-group">
+                <label>Ad</label>
+                <input type="text" name="ad" placeholder="Ad" required>
+            </div>
+            <div class="input-group">
+                <label>Soyad</label>
+                <input type="text" name="soyad" placeholder="Soyad" required>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>E-posta</label>
+            <input type="email" name="email" placeholder="ornek@mail.com" required>
+            <i class="fa-solid fa-envelope field-icon"></i>
+        </div>
+
+        <div class="input-group">
+            <label>Şifre</label>
+            <input type="password" id="sifre" name="sifre" maxlength="10" placeholder="Max 10 Karakter" required>
+            <i class="fa-solid fa-lock field-icon"></i>
+        </div>
+
+        <div class="input-group">
+            <label>Şifre Tekrar</label>
+            <input type="password" id="sifreTekrar" maxlength="10" placeholder="Şifrenizi doğrulayın" required>
+            <i class="fa-solid fa-shield-halved field-icon"></i>
+            <div id="password-error" class="error-msg">Şifreler birbiriyle eşleşmiyor!</div>
+        </div>
+        <button type="submit" class="btn-register">Üyeliği Başlat</button>
+    </form>
+
+    <div class="footer-text">Zaten üye misin? <a href="/login">Giriş Yap</a></div>
+</div>
+
+<script>
+    function validatePasswords() {
+        const pass = document.getElementById('sifre').value;
+        const confirmPass = document.getElementById('sifreTekrar').value;
+        const errorDiv = document.getElementById('password-error');
+
+        if (pass !== confirmPass) {
+            errorDiv.style.display = 'block';
+            document.getElementById('sifreTekrar').style.borderColor = 'var(--red)';
+            return false; // Formun gönderilmesini engeller
+        }
+
+        errorDiv.style.display = 'none';
+        return true; // Formun gönderilmesine izin verir
+    }
+</script>
+
+</body>
+</html>

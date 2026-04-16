@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Netflixo | VIP Experience</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --red: #E50914; --black: #050505; --card-bg: #121212; --gold: #D4AF37; --glass: rgba(255, 255, 255, 0.05); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100vh; background: var(--black); color: #fff; font-family: 'Poppins', sans-serif; overflow: hidden; }
+        header { height: 70px; padding: 0 5%; display: flex; justify-content: space-between; align-items: center; background: rgba(5, 5, 5, 0.95); backdrop-filter: blur(15px); position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05); box-sizing: border-box; }
+        .main-content-wrapper { height: calc(100vh - 70px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--red) transparent; }
+        .logo { font-size: 1.8rem; font-weight: 800; color: var(--red); letter-spacing: -1px; text-transform: uppercase; }
+        .continue-section { padding: 10px 5% 0 5%; display: none; }
+        .continue-grid { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
+        .continue-card { min-width: 180px; max-width: 180px; background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s; flex-shrink: 0; cursor: pointer; position: relative; }
+        .continue-card:hover { border-color: var(--red); transform: scale(1.03); }
+        .continue-card img { width: 100%; height: 100px; object-fit: cover; }
+        .progress-container { height: 4px; background: #333; width: 100%; position: absolute; bottom: 0; }
+        .progress-bar { height: 100%; background: var(--red); width: 0%; }
+        .kredi-pill { background: linear-gradient(90deg, #b8860b, #e5c100); color: #000; padding: 5px 15px; border-radius: 50px; font-weight: 700; font-size: 0.8rem; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3); display: flex; align-items: center; gap: 8px; }
+        .category-nav { display: flex; gap: 10px; padding: 12px 5% 5px 5%; overflow-x: auto; scrollbar-width: none; }
+        .cat-btn { background: var(--glass); color: #aaa; border: 1px solid rgba(255,255,255,0.1); padding: 6px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-size: 0.75rem; font-weight: 600; white-space: nowrap; }
+        .cat-btn.active, .cat-btn:hover { background: var(--red); color: white; border-color: var(--red); }
+        .cat-btn.fav-active { background: var(--gold) !important; color: #000 !important; }
+        .section-title { padding: 0 5%; margin: 15px 0 10px 0; font-size: 1.1rem; font-weight: 800; color: var(--gold); text-transform: uppercase; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px; padding: 10px 5% 40px 5%; }
+        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; transition: 0.4s; border: 1px solid rgba(255,255,255,0.03); position: relative; }
+        .card img { width: 100%; height: 260px; object-fit: cover; cursor: pointer; }
+        .card-actions { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 8px; z-index: 10; }
+        .action-icon { background: rgba(0,0,0,0.6); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
+        .action-icon:hover { background: var(--red); }
+        .action-icon.fav-selected { color: var(--gold); }
+        .card-body { padding: 12px; }
+        .btn-izle { background: #fff; color: #000; width: 100%; padding: 8px; border-radius: 6px; font-weight: 700; border: none; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .btn-izle:hover { background: var(--red); color: white; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: #111; padding: 30px; border-radius: 15px; width: 350px; border: 1px solid var(--gold); text-align: center; }
+        .star-rating { font-size: 1.8rem; margin-bottom: 15px; color: #444; }
+        .star-rating i { cursor: pointer; transition: 0.2s; padding: 0 4px; }
+        .star-rating i.active { color: var(--gold); }
+        .nav-tabs { display:flex; gap:0; padding:0 5%; margin-top:10px; border-bottom:2px solid #222; }
+        .nav-tab { padding:10px 24px; cursor:pointer; font-weight:700; font-size:0.85rem; color:#666; border-bottom:3px solid transparent; margin-bottom:-2px; transition:0.2s; }
+        .nav-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+        .tab-content { display:none; }
+        .tab-content.active { display:block; }
+        .topluluk-wrapper { padding:10px 5% 40px 5%; }
+        .film-grup { margin-bottom:35px; }
+        .film-grup-baslik { display:flex; align-items:center; gap:12px; margin-bottom:15px; padding-bottom:8px; border-bottom:1px solid #222; }
+        .film-grup-baslik img { width:45px; height:65px; object-fit:cover; border-radius:6px; }
+        .film-grup-baslik h3 { margin:0; font-size:1rem; color:#fff; }
+        .film-grup-baslik span { font-size:0.75rem; color:#666; }
+        .yorum-card { background:var(--card-bg); border-radius:10px; padding:14px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.05); }
+        .yorum-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+        .yorum-user { display:flex; align-items:center; gap:10px; }
+        .yorum-avatar { width:32px; height:32px; border-radius:50%; background:var(--red); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.85rem; flex-shrink:0; }
+        .yorum-isim { font-weight:600; font-size:0.85rem; }
+        .yorum-tarih { font-size:0.7rem; color:#555; }
+        .yorum-puan { color:var(--gold); font-size:0.8rem; }
+        .yorum-metin { font-size:0.85rem; color:#ccc; line-height:1.5; margin-bottom:10px; }
+        .yorum-aksiyonlar { display:flex; gap:12px; align-items:center; }
+        .yorum-btn { background:none; border:none; color:#555; cursor:pointer; font-size:0.75rem; display:flex; align-items:center; gap:5px; transition:0.2s; padding:0; }
+        .yorum-btn:hover { color:var(--gold); }
+        .yorum-btn.liked { color:var(--red); }
+        .cevap-alani { margin-top:10px; display:none; }
+        .cevap-input { width:100%; background:#1a1a1a; border:1px solid #333; color:#fff; padding:8px 12px; border-radius:8px; font-size:0.8rem; box-sizing:border-box; font-family:'Poppins',sans-serif; resize:none; }
+        .cevap-input:focus { outline:none; border-color:var(--gold); }
+        .cevaplar { margin-top:10px; padding-left:20px; border-left:2px solid #222; }
+        .cevap-item { background:#1a1a1a; border-radius:8px; padding:10px; margin-bottom:6px; font-size:0.8rem; }
+        .cevap-item strong { color:var(--gold); }
+        .duzenle-alani { display:none; margin-top:8px; }
+        .yorum-own-btn { background:none; border:none; color:#444; cursor:pointer; font-size:0.8rem; transition:0.2s; padding:2px 5px; }
+        .yorum-own-btn:hover { color:var(--gold); }
+        .topluluk-bos { text-align:center; padding:60px 0; color:#444; font-size:0.9rem; }
+    </style>
+</head>
+<body>
+
+<input type="hidden" id="current-user-id" th:value="${session.userId}">
+
+<header>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <div class="logo">NETFLIXO</div>
+        <div id="fav-btn-filter" class="cat-btn" onclick="toggleFavFilter()"><i class="fa-solid fa-crown"></i> FAVORİLER</div>
+        <div class="cat-btn" onclick="pickRandomMovie()" style="color: var(--gold); border-color: var(--gold);"><i class="fa-solid fa-dice"></i> ŞANSIMI DENE</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:15px;">
+        <input type="text" id="search" placeholder="Ara..." onkeyup="handleSearch()" style="background:var(--glass); border:1px solid #333; color:white; padding:6px 15px; border-radius:20px; font-size:0.8rem;">
+        <div class="kredi-pill"><i class="fa-solid fa-bolt"></i> <span id="kredi-display" th:text="${kredi} != null ? ${kredi} + ' DK' : '1000 DK'">1000 DK</span></div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <a href="/profil" style="text-decoration:none; color:white; display:flex; align-items:center; gap:10px;">
+                <span style="font-size: 0.85rem; font-weight: 700;" th:text="${ad}">kemal</span>
+                <img id="navAvatar" src="" style="width:32px; height:32px; border-radius:50%; border:2px solid var(--gold);">
+            </a>
+            <a href="/logout"><i class="fa-solid fa-right-from-bracket" style="color:#555"></i></a>
+        </div>
+    </div>
+</header>
+
+<div id="comment-modal" class="modal">
+    <div class="modal-content">
+        <h3 id="modal-movie-title" style="color:var(--gold)">Film Puanla</h3>
+        <div class="star-rating" id="star-container">
+            <i class="fa-solid fa-star" data-value="1" onclick="setRating(1)"></i>
+            <i class="fa-solid fa-star" data-value="2" onclick="setRating(2)"></i>
+            <i class="fa-solid fa-star" data-value="3" onclick="setRating(3)"></i>
+            <i class="fa-solid fa-star" data-value="4" onclick="setRating(4)"></i>
+            <i class="fa-solid fa-star" data-value="5" onclick="setRating(5)"></i>
+        </div>
+        <input type="hidden" id="modal-movie-id">
+        <textarea id="comment-text" rows="3" placeholder="Yorumun..." class="cevap-input"></textarea>
+        <div style="margin-top:15px; display:flex; gap:10px;">
+            <button class="btn-izle" onclick="submitRating()">GÖNDER</button>
+            <button class="btn-izle" style="background:#333;" onclick="closeModal()">KAPAT</button>
+        </div>
+    </div>
+</div>
+
+<div class="main-content-wrapper">
+    <div class="nav-tabs">
+        <div class="nav-tab active" id="tab-btn-filmler" onclick="switchTab('filmler', this)">
+            <i class="fa-solid fa-film"></i> FİLMLER
+        </div>
+        <div class="nav-tab" id="tab-btn-topluluk" onclick="switchTab('topluluk', this)">
+            <i class="fa-solid fa-users"></i> TOPLULUK
+        </div>
+    </div>
+
+    <div id="tab-filmler" class="tab-content active">
+        <div id="continue-watching-section" class="continue-section">
+            <div class="section-title"><i class="fa-solid fa-clock-rotate-left"></i> İZLEMEYE <span>DEVAM ET</span></div>
+            <div id="continue-grid" class="continue-grid"></div>
+        </div>
+        <div class="category-nav">
+            <button class="cat-btn active" onclick="filterByCategory('Hepsi')">TÜMÜ</button>
+            <button class="cat-btn" onclick="filterByCategory('Aksiyon')">AKSİYON</button>
+            <button class="cat-btn" onclick="filterByCategory('Animasyon')">ANİMASYON</button>
+            <button class="cat-btn" onclick="filterByCategory('Bilim Kurgu')">BİLİM KURGU</button>
+            <button class="cat-btn" onclick="filterByCategory('Komedi')">KOMEDİ</button>
+        </div>
+        <div id="dynamic-content"></div>
+    </div>
+
+    <div id="tab-topluluk" class="tab-content">
+        <div class="topluluk-wrapper">
+            <div id="topluluk-icerik"></div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    
+    const currentUserIdFromSession = [[${session.userId}]];
+    const currentUserName = [[${ad}]] || 'Misafir';
+
+    let favorites = JSON.parse(localStorage.getItem(currentUserName + '_favs') || "[]");
+    let hiddenMovies = JSON.parse(localStorage.getItem(currentUserName + '_hiddens') || "[]");
+    let lastWatched = JSON.parse(localStorage.getItem(currentUserName + '_history') || "[]");
+    let selectedCategory = 'Hepsi';
+    let isFavFilterActive = false;
+    let currentRating = 0;
+    let likes = JSON.parse(localStorage.getItem(currentUserName + '_likes') || "[]");
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const savedColor = localStorage.getItem('userTheme') || '#E50914';
+        const navAvatar = document.getElementById('navAvatar');
+        if (navAvatar) {
+            navAvatar.src = `https://ui-avatars.com/api/?name=${currentUserName.charAt(0)}&background=${savedColor.replace('#','')}&color=fff`;
+            navAvatar.style.borderColor = savedColor;
+        }
+        document.documentElement.style.setProperty('--red', savedColor);
+        render();
+    });
+function izle(filmAd, id) {
+    const krediSpan = document.getElementById('kredi-display');
+    const userId = currentUserIdFromSession;
+    if (!userId) { alert("Lütfen giriş yapın."); return; }
+
+    let mevcutKredi = parseInt(krediSpan.innerText.replace(/\D/g, ""));
+    if (mevcutKredi < 10) { alert("Yetersiz dakika!"); return; }
+
+    // 1. Krediyi düş
+    fetch('/dakika-ekle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ miktar: -10, sabit: false })
+    })
+    .then(r => r.text())
+    .then(yeniKredi => {
+        if (yeniKredi !== "Hata") {
+            document.getElementById('kredi-display').innerText = yeniKredi + " DK";
+
+            // 2. SQL izleme tablosunu güncelle
+            fetch('/api/izleme/guncelle', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    kullaniciId: parseInt(userId),
+                    filmId: parseInt(id)
+                })
+            })
+            .then(r => r.text())
+            .then(msg => console.log("İzleme SQL:", msg))
+            .catch(err => console.error("İzleme hatası:", err));
+
+            // 3. Frontend geçmişi güncelle
+            let historyItem = lastWatched.find(h => h.id === id);
+            if (historyItem) {
+                historyItem.progress = Math.min((historyItem.progress || 0) + 10, 100);
+                lastWatched = [historyItem, ...lastWatched.filter(h => h.id !== id)];
+            } else {
+                lastWatched.unshift({ id: id, progress: 10 });
+            }
+            if (lastWatched.length > 6) lastWatched.pop();
+            localStorage.setItem(currentUserName + '_history', JSON.stringify(lastWatched));
+
+            render();
+        }
+    });
+}
+
+    function render() {
+    renderContinueWatching();
+    const dynamicContent = document.getElementById('dynamic-content');
+    const query = document.getElementById('search').value.toLowerCase();
+
+    let list;
+
+    if (query) {
+        // Arama yapılıyorsa: Gizlenenler dahil TÜM filmler içinde ara
+        list = movies.filter(m => m.ad.toLowerCase().includes(query));
+    } else {
+        // Arama yapılmıyorsa: Sadece gizlenmemiş olanları göster
+        list = movies.filter(m => !hiddenMovies.includes(m.id));
+    }
+
+    // Diğer filtreleri uygula (Favori ve Kategori)
+    if (isFavFilterActive) list = list.filter(m => favorites.includes(m.id));
+    if (selectedCategory !== 'Hepsi') list = list.filter(m => m.tur === selectedCategory);
+
+    dynamicContent.innerHTML = `
+        <div class="section-title">${query ? 'Arama Sonuçları' : selectedCategory}</div>
+        <div class="grid">${list.map(m => `
+            <div class="card" id="movie-${m.id}">
+                <div class="card-actions">
+                    <div class="action-icon ${favorites.includes(m.id) ? 'fav-selected' : ''}" onclick="toggleFavorite(${m.id})"><i class="fa-solid fa-crown"></i></div>
+                    <div class="action-icon" onclick="toggleHide(${m.id})">
+                        <i class="fa-solid ${hiddenMovies.includes(m.id) ? 'fa-eye' : 'fa-eye-slash'}"></i>
+                    </div>
+                </div>
+                <img src="${m.img}" onclick="openModal('${m.ad}', ${m.id})" onerror="this.src='https://via.placeholder.com/200x300?text=Poster'">
+                <div class="card-body">
+                    <div style="font-size:0.9rem; font-weight:600; margin-bottom:10px;">
+                        ${m.ad} ${hiddenMovies.includes(m.id) ? '<span style="color:gray; font-size:0.7rem;">(Gizli)</span>' : ''}
+                    </div>
+                    <button class="btn-izle" onclick="izle('${m.ad}', ${m.id})">Hemen İzle</button>
+                </div>
+            </div>
+        `).join('')}</div>`;
+}
+
+    function renderContinueWatching() {
+        const section = document.getElementById('continue-watching-section');
+        const grid = document.getElementById('continue-grid');
+        if (lastWatched.length === 0) { section.style.display = 'none'; return; }
+        section.style.display = 'block';
+        const watchedData = movies.filter(m => lastWatched.some(h => h.id === m.id));
+        grid.innerHTML = watchedData.map(m => {
+            const historyItem = lastWatched.find(h => h.id === m.id);
+            return `<div class="continue-card" onclick="izle('${m.ad}', ${m.id})">
+                <img src="${m.img}">
+                <div class="progress-container"><div class="progress-bar" style="width: ${historyItem.progress}%"></div></div>
+                <div style="padding: 5px; font-size: 11px; text-align:center;">${m.ad}</div>
+            </div>`;
+        }).join('');
+    }
+
+    function toggleFavorite(id) { if (favorites.includes(id)) favorites = favorites.filter(fid => fid !== id); else favorites.push(id); localStorage.setItem(currentUserName + '_favs', JSON.stringify(favorites)); render(); }
+    function toggleHide(id) {
+    if (hiddenMovies.includes(id)) {
+        hiddenMovies = hiddenMovies.filter(mid => mid !== id);
+    } else {
+        hiddenMovies.push(id);
+    }
+    localStorage.setItem(currentUserName + '_hiddens', JSON.stringify(hiddenMovies));
+    render();
+}
+    function toggleFavFilter() { isFavFilterActive = !isFavFilterActive; document.getElementById('fav-btn-filter').classList.toggle('fav-active'); render(); }
+    function setRating(val) { currentRating = val; document.querySelectorAll('#star-container i').forEach(s => s.classList.toggle('active', parseInt(s.dataset.value) <= val)); }
+
+    function submitRating() {
+    const filmId = document.getElementById('modal-movie-id').value;
+    const yorum  = document.getElementById('comment-text').value;
+    if (currentRating === 0) return alert("Puan seçin!");
+    fetch('/yorum-kaydet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ filmId: filmId, yorumMetni: yorum, puan: currentRating })
+    }).then(() => {
+        // Formu temizle
+        document.getElementById('comment-text').value = '';
+        currentRating = 0;
+        document.querySelectorAll('#star-container i').forEach(s => s.classList.remove('active'));
+
+        alert("Kaydedildi!");
+        closeModal();
+        toplulukYuklendi = false;
+        if (document.getElementById('tab-topluluk').classList.contains('active')) {
+            toplulukYukle();
+        }
+    });
+}
+
+    function openModal(title, id) { document.getElementById('modal-movie-title').innerText = title; document.getElementById('modal-movie-id').value = id; document.getElementById('comment-modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('comment-modal').style.display = 'none'; }
+    function filterByCategory(cat) { selectedCategory = cat; render(); }
+    function handleSearch() { render(); }
+    function pickRandomMovie() {
+        const available = movies.filter(m => !hiddenMovies.includes(m.id));
+        const random = available[Math.floor(Math.random() * available.length)];
+        const el = document.getElementById(`movie-${random.id}`);
+        if(el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.style.borderColor = 'var(--gold)'; setTimeout(() => { el.style.borderColor = ''; }, 3000); }
+    }
+
+    function switchTab(tab, el) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+        if (tab === 'topluluk') toplulukYukle();
+    }
+
+
+   // --- TOPLULUK FONKSİYONLARI ---
+
+    function toplulukYukle() {
+        const istekler = movies.map(m =>
+            fetch('/yorumlar-getir/' + m.id)
+            .then(r => r.json())
+            .then(yorumlar => ({ film: m, yorumlar: yorumlar }))
+            .catch(() => ({ film: m, yorumlar: [] }))
+        );
+
+        Promise.all(istekler).then(sonuclar => {
+            const doluSonuclar = sonuclar.filter(s => s.yorumlar && s.yorumlar.length > 0);
+
+            if (doluSonuclar.length === 0) {
+                document.getElementById('topluluk-icerik').innerHTML = `<div class="topluluk-bos">Henüz yorum yok!</div>`;
+                return;
+            }
+
+            let html = '';
+            doluSonuclar.forEach(({ film, yorumlar }) => {
+                const anaYorumlar = yorumlar.filter(y => !y.yorum.startsWith('↩'));
+                const tumYanitlar = yorumlar.filter(y => y.yorum.startsWith('↩'));
+
+                html += `<div class="film-grup">
+                    <div class="film-grup-baslik">
+                        <img src="${film.img}" onerror="this.style.display='none'">
+                        <div><h3>${film.ad}</h3><span>${anaYorumlar.length} yorum</span></div>
+                    </div>`;
+
+                anaYorumlar.forEach(y => {
+                    const isOwn   = String(y.kullaniciId) === String(currentUserIdFromSession);
+                    const isLiked = likes.includes(y.id);
+                    const puan    = y.puan ? '⭐'.repeat(Math.min(y.puan, 5)) : '';
+                    const initial = (y.kullaniciAd || 'U').charAt(0).toUpperCase();
+
+                    const buYorumaYanitlar = tumYanitlar.filter(r =>
+                        r.yorum.includes(`@${y.kullaniciAd}`)
+                    );
+
+                    html += `<div class="yorum-card" id="yorum-${y.id}">
+                        <div class="yorum-header">
+                            <div class="yorum-user">
+                                <div class="yorum-avatar">${initial}</div>
+                                <div>
+                                    <div class="yorum-isim">${y.kullaniciAd || 'Kullanıcı'}</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="yorum-puan">${puan}</span>
+                                ${isOwn ? `
+                                <button class="yorum-own-btn" onclick="duzenleAc(${y.id})" title="Düzenle"><i class="fa-solid fa-pen"></i></button>
+                                <button class="yorum-own-btn" onclick="yorumSil(${y.id})" title="Sil"><i class="fa-solid fa-trash"></i></button>` : ''}
+                            </div>
+                        </div>
+
+                        <div class="yorum-metin" id="metin-${y.id}">${y.yorum}</div>
+
+                        <div class="yorum-aksiyonlar">
+                            <button class="yorum-btn ${isLiked ? 'liked' : ''}" onclick="toggleLike(${y.id})">
+                                <i class="fa-heart fa-${isLiked ? 'solid' : 'regular'}"></i> Beğen
+                            </button>
+                            <button class="yorum-btn" onclick="cevapAc(${y.id})">
+                                <i class="fa-comment fa-regular"></i> Yanıtla
+                            </button>
+                        </div>
+
+                        <div class="cevap-alani" id="cevap-alani-${y.id}">
+                            <textarea class="cevap-input" id="cevap-input-${y.id}" rows="2"
+                                placeholder="@${y.kullaniciAd} yanıt yaz..."></textarea>
+                            <button class="btn-izle" style="width:auto; margin-top:5px;"
+                                onclick="cevapGonder(${y.id}, ${film.id}, '${y.kullaniciAd}')">Gönder</button>
+                        </div>
+
+                        <div class="cevaplar">
+                            ${buYorumaYanitlar.map(r => `
+                                <div class="cevap-item">
+                                    <strong style="color:var(--gold)">${r.kullaniciAd}</strong>: ${r.yorum.replace(/↩\s*@[^:]+:\s*/, '')}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>`;
+                });
+                html += `</div>`;
+            });
+            document.getElementById('topluluk-icerik').innerHTML = html;
+        });
+    }
+
+    // --- DÜZENLEME MODUNU AÇAN EKSİK FONKSİYON ---
+    function duzenleAc(id) {
+        const metinEl = document.getElementById('metin-' + id);
+        const eskiMetin = metinEl.innerText;
+        metinEl.innerHTML = `
+            <textarea id="duzenle-input-${id}" class="cevap-input" rows="2" style="margin-bottom:5px; border:1px solid var(--gold);">${eskiMetin}</textarea>
+            <div style="display:flex; gap:5px;">
+                <button class="btn-izle" style="width:auto; padding:3px 10px; font-size:0.7rem; background:var(--gold); color:#000;" onclick="duzenleKaydet(${id})">KAYDET</button>
+                <button class="btn-izle" style="width:auto; padding:3px 10px; font-size:0.7rem; background:#333;" onclick="toplulukYukle()">İPTAL</button>
+            </div>
+        `;
+    }
+
+    function duzenleKaydet(id) {
+        const yeniMetin = document.getElementById('duzenle-input-' + id).value.trim();
+        if (!yeniMetin) return;
+        fetch('/yorum-duzenle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ yorumId: id, yeniMetin: yeniMetin })
+        }).then(res => {
+            if(res.ok) toplulukYukle();
+            else alert("Güncellenirken hata oluştu.");
+        });
+    }
+
+    function toggleLike(id) {
+        if(likes.includes(id)) likes = likes.filter(l => l !== id); else likes.push(id);
+        localStorage.setItem(currentUserName + '_likes', JSON.stringify(likes));
+        toplulukYukle();
+    }
+
+    function cevapAc(id) {
+        const el = document.getElementById('cevap-alani-' + id);
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function cevapGonder(yorumId, filmId, hedefAd) {
+        const metin = document.getElementById('cevap-input-' + yorumId).value.trim();
+        if (!metin) return;
+        fetch('/yorum-kaydet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ filmId: filmId, yorumMetni: `↩ @${hedefAd}: ` + metin, puan: 0 })
+        }).then(() => { toplulukYukle(); });
+    }
+
+    function yorumSil(id) {
+        if(confirm('Bu yorumu silmek istediğine emin misin Begüm?')) {
+            fetch('/yorum-sil/'+id, {method:'DELETE'}).then(() => toplulukYukle());
+        }
+    }
+</script>
+</body>
+</html>
